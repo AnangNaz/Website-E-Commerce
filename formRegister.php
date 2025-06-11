@@ -20,9 +20,126 @@ unset($_SESSION['no_telp']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halaman Registrasi</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        main.container {
+            background: #ffffff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .title {
+            font-size: 28px;
+            margin-bottom: 8px;
+            text-align: center;
+            color: #333;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            text-align: center;
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            transition: border 0.2s ease;
+        }
+
+        input:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: #0056b3;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #842029;
+            border: 1px solid #f5c2c7;
+        }
+
+        .message.success {
+            background-color: #d1e7dd;
+            color: #0f5132;
+            border: 1px solid #badbcc;
+        }
+
+        .message ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        @media (max-width: 600px) {
+            main.container {
+                padding: 20px;
+            }
+
+            .title {
+                font-size: 24px;
+            }
+
+            .subtitle {
+                font-size: 14px;
+            }
+        }
+    </style>
 </head>
-<body>
+<body class="register-page">
     <main class="container" role="main">
         <h1 class="title">Daftar Akun Baru</h1>
         <p class="subtitle">Isi formulir berikut untuk membuat akun baru Anda.</p>
@@ -73,6 +190,6 @@ unset($_SESSION['no_telp']);
             <button type="submit" class="btn-submit" aria-label="Daftar akun baru">Daftar</button>
         </form>
     </main>
-
 </body>
 </html>
+

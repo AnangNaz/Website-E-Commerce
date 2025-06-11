@@ -89,6 +89,6 @@ if (isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password'])
     $_SESSION['no_telp'] = $no_telp; 
 }
 
-header("Location: register.php");
+header("Location: login.php");
 exit();
 ?>
