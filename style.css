@@ -96,6 +96,96 @@
   margin-top: 1rem;
 }
 
+body.register-page {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f1f5f9;
+  margin: 0;
+  padding: 0;
+}
+
+/* Gaya untuk form di <main> */
+body.register-page main {
+  max-width: 500px;
+  margin: 80px auto;
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 30px;
+  font-size: 14px;
+}
+
+.message {
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.message.error {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+.message.success {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+  border-color: #3b82f6;
+}
+
+.button-submit {
+  width: 100%;
+  padding: 12px;
+  background-color: #1d4ed8;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button-submit:hover {
+  background-color: #2563eb;
+}
 
 
 /*# sourceMappingURL=style.css.map */
