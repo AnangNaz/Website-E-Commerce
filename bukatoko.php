@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $logo = file_get_contents($_FILES['logo']['tmp_name']);
     }
 
-    $stmt = $db->prepare("INSERT INTO stores (user_id, nama_toko, deskripsi, logo) VALUES (?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO stores (user_id, nama_toko, deskripsi, logo) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("isss", $user_id, $nama_toko, $deskripsi, $logo);
     $stmt->send_long_data(3, $logo);
 

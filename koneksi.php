@@ -1,12 +1,12 @@
 <?php
 $hostname = "localhost";
 $username = "root";
-$password = "";
+$password = "Anangnaz";
 $db_name = "ecomm";
 
-$db = new mysqli($hostname, $username, $password, $db_name);
+$conn = new mysqli($hostname, $username, $password, $db_name);
 
-if ($db->connect_error) {
+if ($conn->connect_error) {
     echo "koneksi gagal";
 } else {
 

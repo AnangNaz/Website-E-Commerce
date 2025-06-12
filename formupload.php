@@ -55,11 +55,18 @@
 
     <form action="upload.php" method="POST" enctype="multipart/form-data">
         <h2 style="text-align: center; margin-bottom: 20px;">Upload Produk</h2>
+        <label for="">Nama Produk</label>
         <input type="text" name="nama" placeholder="Nama Produk" required>
+         <label for="">Harga</label>
         <input type="number" name="harga" placeholder="Harga" required>
+         <label for="">Rating</label>
         <input type="number" name="rating" min="0" max="5" value="4" required>
+         <label for="">Stock</label>
+        <input type="number" name="stock"  required>
+         <label for="">Gambar Produk</label>
         <input type="file" name="gambar" required>
         <button type="submit">Upload Produk</button>
+        <button><a href="dashboardToko.php">Dashboard Toko</a></button>
     </form>
 
 </body>

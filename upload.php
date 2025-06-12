@@ -11,13 +11,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nama = $_POST['nama'];
     $harga = $_POST['harga'];
     $rating = $_POST['rating'];
+    $stock = $_POST['stock'];
     $gambar = file_get_contents($_FILES['gambar']['tmp_name']);
     $tipe = $_FILES['gambar']['type'];
 
     $user_id = $_SESSION['user_id'];
 
-    // Ambil store_id milik user
-    $stmt_store = $db->prepare("SELECT id FROM stores WHERE user_id = ?");
+    $stmt_store = $conn->prepare("SELECT id FROM stores WHERE user_id = ?");
     $stmt_store->bind_param("i", $user_id);
     $stmt_store->execute();
     $result = $stmt_store->get_result();
@@ -30,9 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $store = $result->fetch_assoc();
     $store_id = $store['id'];
 
-    // Simpan produk
-    $stmt = $db->prepare("INSERT INTO produk (nama, harga, rating, gambar, tipe_gambar, store_id) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sdissi", $nama, $harga, $rating, $gambar, $tipe, $store_id);
+    $stmt = $conn->prepare("INSERT INTO produk (nama, harga, rating, gambar, stock, tipe_gambar, store_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
+
+    $stmt->bind_param("sdisssi", $nama, $harga, $rating, $gambar, $stock, $tipe, $store_id);
+
     $stmt->send_long_data(3, $gambar);
 
     if ($stmt->execute()) {
@@ -41,4 +42,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo "❌ Gagal upload: " . $stmt->error;
     }
 }
-?>

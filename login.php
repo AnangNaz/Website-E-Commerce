@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "Email dan password harus diisi.";
     } else {
         $query = "SELECT * FROM user WHERE email = ?";
-        $stmt = $db->prepare($query);
+        $stmt = $conn->prepare($query);
         if ($stmt) {
             $stmt->bind_param("s", $email);
             $stmt->execute();
@@ -21,7 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($result && $result->num_rows === 1) {
                 $user = $result->fetch_assoc();
                 if (password_verify($password, $user['password'])) {
-                    // Login berhasil
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['user_name'] = $user['nama'];
                     header("Location: index.php");
@@ -42,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
@@ -115,10 +115,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     </style>
 </head>
+
 <body class="login-page">
     <div class="login-container">
         <h2>Login</h2>
-<form action="login.php" method="post">
+        <?php if (!empty($error)): ?>
+            <div style="color: red; margin-bottom: 16px;">
+                <?= htmlspecialchars($error) ?>
+            </div>
+        <?php endif; ?>
+
+        <form action="login.php" method="POST">
 
             <label for="email">Email</label>
             <input type="text" name="email" id="email" required>
@@ -126,9 +133,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="password">Password</label>
             <input type="password" name="password" id="password" required>
 
-            <input type="submit" value="Login">
+            <input type="submit">
         </form>
     </div>
 </body>
-</html>
 
+</html>
