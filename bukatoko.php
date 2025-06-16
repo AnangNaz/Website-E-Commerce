@@ -3,10 +3,7 @@ session_start();
 include("koneksi.php");
 
 // Cek login
-if (!isset($_SESSION['user_id'])) {
-    echo "Anda harus login terlebih dahulu.";
-    exit();
-}
+
 
 $pesan = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -37,25 +34,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
     <title>Buka Toko</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <h2>Buka Toko Baru</h2>
+<body class="register-page">
+    <main role="main">
+    <h2 class="title">Buka Toko Baru</h2>
 
     <?php if ($pesan): ?>
         <p><?= $pesan ?></p>
     <?php endif; ?>
 
     <form method="POST" enctype="multipart/form-data">
-        <label>Nama Toko:</label><br>
-        <input type="text" name="nama_toko" required><br><br>
-
-        <label>Deskripsi:</label><br>
-        <textarea name="deskripsi" rows="4" cols="40"></textarea><br><br>
-
+         <div class="form-group">
+                <label for="name">Nama Toko</label>
+                <input type="text"  name="nama_toko" required>
+         </div>
+         <div class="form-group">
+            <label>Deskripsi:</label><br>
+        <textarea name="deskripsi" rows="4" cols="40"></textarea>
+        </div>
+        <div class="form_group">
         <label>Logo (gambar):</label><br>
-        <input type="file" name="logo" accept="image/*"><br><br>
+        <input type="file" name="logo" accept="image/*">    
+        </div>
 
-        <input type="submit" value="Buka Toko">
+        <input type="submit" class="button-submit" value="Buka Toko">
     </form>
+    </main>
 </body>
 </html>
