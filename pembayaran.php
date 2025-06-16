@@ -9,6 +9,7 @@ $harga = $_POST['harga'] ?? $_SESSION['harga'] ?? '';
 $_SESSION['produk_id'] = $produk_id;
 $_SESSION['nama'] = $nama;
 $_SESSION['harga'] = $harga;
+$totalHarga = $_SESSION['harga'] * $_SESSION['jumlah_beli'];
 
 $result = mysqli_query($conn, "SELECT stock, gambar, tipe_gambar FROM produk WHERE id = $produk_id");
 $data = mysqli_fetch_assoc($result);
@@ -211,12 +212,13 @@ if (isset($_GET['alert'])) {
                 </form>
             </div>
 
-            <form action="proses_bayar.php" method="post">
+            <form action="prosesBayar.php" method="post">
                 <input type="hidden" name="produk_id" value="<?= $produk_id ?>" />
                 <input type="hidden" name="harga" value="<?= $harga ?>" />
                 <input type="hidden" name="jumlah" value="<?= $jumlah_beli ?>" />
                 <button type="submit" class="btn-bayar">Bayar Sekarang</button>
             </form>
+
         </div>
     </div>
 </body>
