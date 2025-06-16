@@ -2,6 +2,10 @@
 include 'koneksi.php';
 session_start();
 
+if (!isset($_SESSION['jumlah_beli'])) {
+    $_SESSION['jumlah_beli'] = 1;
+}
+
 $produk_id = $_POST['produk_id'] ?? $_SESSION['produk_id'] ?? '';
 $nama = $_POST['nama'] ?? $_SESSION['nama'] ?? '';
 $harga = $_POST['harga'] ?? $_SESSION['harga'] ?? '';
@@ -9,17 +13,25 @@ $harga = $_POST['harga'] ?? $_SESSION['harga'] ?? '';
 $_SESSION['produk_id'] = $produk_id;
 $_SESSION['nama'] = $nama;
 $_SESSION['harga'] = $harga;
-$totalHarga = $_SESSION['harga'] * $_SESSION['jumlah_beli'];
 
-$result = mysqli_query($conn, "SELECT stock, gambar, tipe_gambar FROM produk WHERE id = $produk_id");
+$jumlah_beli = $_SESSION['jumlah_beli'];
+
+$result = mysqli_query($conn, "SELECT stock, gambar, tipe_gambar, store_id FROM produk WHERE id = $produk_id");
 $data = mysqli_fetch_assoc($result);
+
 $stok_db = $data['stock'];
+$stok_sisa = $stok_db - $jumlah_beli;
 $tipe = $data['tipe_gambar'];
 $img = base64_encode($data['gambar']);
 
-if (!isset($_SESSION['jumlah_beli'])) {
-    $_SESSION['jumlah_beli'] = 1;
-}
+$_SESSION['store_id'] = $data['store_id'];
+
+$resultToko = mysqli_query($conn, "SELECT nama_toko FROM stores WHERE id = {$data['store_id']}");
+$dataToko = mysqli_fetch_assoc($resultToko);
+$_SESSION['nama_toko'] = $dataToko['nama_toko'] ?? '';
+
+$totalHarga = $_SESSION['harga'] * $jumlah_beli;
+
 
 $alert = '';
 if (isset($_POST['aksi'])) {
@@ -45,8 +57,6 @@ if (isset($_POST['aksi'])) {
     exit;
 }
 
-$jumlah_beli = $_SESSION['jumlah_beli'];
-$stok_sisa = $stok_db - $jumlah_beli;
 
 if (isset($_GET['alert'])) {
     $alert = $_GET['alert'];
@@ -179,7 +189,6 @@ if (isset($_GET['alert'])) {
 
 <body>
     <div class="container">
-        <!-- Tombol Kembali di atas card -->
         <a href="index.php" class="btn-secondary">← Kembali ke Homepage</a>
 
         <div class="card">

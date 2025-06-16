@@ -8,8 +8,8 @@ $nama = '';
 $email = '';
 $no_telp = '';
 
-if ($db->connect_error) {
-    die("Koneksi gagal: " . $db->connect_error);
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
 }
 
 if (isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password']) && isset($_POST['no_telp'])) {
@@ -37,9 +37,9 @@ if (isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password'])
 
     if (empty($error)) {
         $query_check_email = "SELECT * FROM user WHERE email = ?";
-        $stmt_check_email = $db->prepare($query_check_email);
+        $stmt_check_email = $conn->prepare($query_check_email);
         if ($stmt_check_email === false) {
-            $error[] = 'Gagal mempersiapkan statement: ' . $db->error;
+            $error[] = 'Gagal mempersiapkan statement: ' . $conn->error;
         } else {
             $stmt_check_email->bind_param("s", $email);
             $stmt_check_email->execute();
@@ -49,9 +49,9 @@ if (isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password'])
                 $error[] = 'Email sudah terdaftar.';
             } else {
                 $query_check_no_telp = "SELECT * FROM user WHERE no_telp = ?";
-                $stmt_check_no_telp = $db->prepare($query_check_no_telp);
+                $stmt_check_no_telp = $conn->prepare($query_check_no_telp);
                 if ($stmt_check_no_telp === false) {
-                    $error[] = 'Gagal mempersiapkan statement: ' . $db->error;
+                    $error[] = 'Gagal mempersiapkan statement: ' . $conn->error;
                 } else {
                     $stmt_check_no_telp->bind_param("s", $no_telp);
                     $stmt_check_no_telp->execute();
@@ -62,9 +62,9 @@ if (isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password'])
                     } else {
                         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
                         $query = "INSERT INTO user (nama, email, password, no_telp) VALUES (?, ?, ?, ?)";
-                        $stmt = $db->prepare($query);
+                        $stmt = $conn->prepare($query);
                         if ($stmt === false) {
-                            $error[] = 'Gagal mempersiapkan statement: ' . $db->error;
+                            $error[] = 'Gagal mempersiapkan statement: ' . $conn->error;
                         } else {
                             $stmt->bind_param("ssss", $nama, $email, $hashed_password, $no_telp);
 
