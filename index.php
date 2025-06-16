@@ -57,21 +57,6 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
             <a class="nav-link" href="#">On Sale</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Category</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Products <i class="fas fa-chevron-down"></i></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Blog</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Category <i class="fas fa-chevron-down"></i></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Coming Soon</a>
-          </li>
-          <li class="nav-item">
             <a class="nav-link" href="dashboardToko.php">Toko Saya</a>
           </li>
           <li>
@@ -117,7 +102,7 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
     <section id="top-sale">
       <div class="container py-5">
         <?php
-        $conn = new mysqli("localhost", "root", "Anangnaz", "ecomm");
+        $conn = new mysqli("localhost", "root", "", "ecomm");
 
         $toko_result = $conn->query("SELECT id, nama_toko FROM stores");
 
