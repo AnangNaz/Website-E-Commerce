@@ -2,14 +2,12 @@
 
 session_start();
 if (!isset($_SESSION['user_id'])) {
-  header("Location: formLogin.php");
+  header("Location: login.php");
   exit();
 }
 
 echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
-
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -76,6 +74,12 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
           <li class="nav-item">
             <a class="nav-link" href="dashboardToko.php">Toko Saya</a>
           </li>
+          <li>
+            <form method="GET" action="search.php" class="search-form" style="display:flex; align-items:center;">
+              <input type="text" name="search" placeholder="Cari produk atau toko..." style="padding:6px 10px; font-size:14px;" />
+              <button type="submit" style="padding:6px 12px; margin-left:8px; cursor:pointer;">Cari</button>
+            </form>
+          </li>
         </ul>
         <form action="#" class="font-size-14 font-rale">
           <a href="#" class="py-2 rounded-pill color-primary-bg">
@@ -115,7 +119,6 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
         <?php
         $conn = new mysqli("localhost", "root", "Anangnaz", "ecomm");
 
-        // Ambil semua toko
         $toko_result = $conn->query("SELECT id, nama_toko FROM stores");
 
         while ($store = $toko_result->fetch_assoc()) {
@@ -130,6 +133,7 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
           while ($row = $produk_result->fetch_assoc()) {
             $img = base64_encode($row['gambar']);
             $tipe = $row['tipe_gambar'];
+            $stok = $row['stock'];
         ?>
             <div class="item py-2">
               <div class="product font-rale">
@@ -146,10 +150,21 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
                       <span>IDR<?php echo $row['harga']; ?></span>
                     </div>
                     <div class="stock py-1 text-secondary">
-                      Stok: <?php echo $row['stock']; ?>
+                      Stok: <?php echo $stok; ?>
                     </div>
 
-                    <button type="submit" class="btn btn-warning font-size-12">Add to Cart</button>
+                    <?php if ($stok >= 1) { ?>
+                      <!-- Tombol aktif jika stok mencukupi -->
+                      <form action="pembayaran.php" method="post">
+                        <input type="hidden" name="produk_id" value="<?php echo $row['id']; ?>">
+                        <input type="hidden" name="nama" value="<?php echo $row['nama']; ?>">
+                        <input type="hidden" name="harga" value="<?php echo $row['harga']; ?>">
+                        <button type="submit" class="btn btn-warning font-size-12">Add to Cart</button>
+                      </form>
+                    <?php } else { ?>
+                      <!-- Tombol nonaktif jika stok habis -->
+                      <button class="btn btn-secondary font-size-12" disabled>Stok Habis</button>
+                    <?php } ?>
                   </div>
                 </div>
               </div>
@@ -157,11 +172,12 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
         <?php
           }
 
-          echo '</div><br>'; 
+          echo '</div><br>';
         }
         ?>
       </div>
     </section>
+
     <!-- !Top Sale per Toko -->
 
     <!-- Special Price -->
