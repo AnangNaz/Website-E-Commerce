@@ -40,7 +40,7 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
     <div class="strip d-flex justify-content-between px-4 py-1 bg-light">
       <p class="font-rale font-size-12 text-black-50 m-0">Jordan Calderon 430-985 Eleifend St. Duluth Washington 92611 (427) 930-5255</p>
       <div class="font-rale font-size-14">
-        <a href="#" class="px-3 border-right border-left text-dark">Login</a>
+        <a href="login.php" class="px-3 border-right border-left text-dark">Login</a>
         <a href="#" class="px-3 border-right text-dark">Whishlist (0)</a>
       </div>
     </div>
@@ -102,7 +102,7 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
     <section id="top-sale">
       <div class="container py-5">
         <?php
-        $conn = new mysqli("localhost", "root", "", "ecomm");
+        $conn = new mysqli("localhost", "root", "Anangnaz", "ecomm");
 
         $toko_result = $conn->query("SELECT id, nama_toko FROM stores");
 
