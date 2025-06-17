@@ -59,8 +59,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['passwordBaru'])) {
                 <input type="submit" value="Ubah Password">
             </form>
         <?php endif; ?>
-
-        <p style="text-align: center; margin-top: 10px;">
             <a href="login.php">Kembali ke Login</a>
         </p>
     </div>
