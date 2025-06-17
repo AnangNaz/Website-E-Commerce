@@ -64,6 +64,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <label for="password">Password</label>
             <input type="password" name="password" id="password" required>
+            <a href="resetPassword.php">Lupa Password?</a>
+            </p>
 
             <input type="submit">
         </form>
