@@ -8,7 +8,7 @@ if (!isset($_SESSION['produk_id'], $_SESSION['nama'], $_SESSION['store_id'], $_S
 
 $produk_id = $_SESSION['produk_id'];
 $nama_produk = $_SESSION['nama'];
-$store_id = $_SESSION['store_id'];
+$toko_id = $_SESSION['store_id']; 
 $nama_toko = $_SESSION['nama_toko'];
 $harga_satuan = $_SESSION['harga'];
 $jumlah = $_SESSION['jumlah_beli'];
@@ -18,70 +18,59 @@ $jumlah_post = isset($_POST['jumlah']) ? (int)$_POST['jumlah'] : $jumlah;
 $metodeDipilih = $_POST['metode'] ?? '';
 
 $total = $harga * $jumlah_post;
-
 $biayaAdmin = 0;
-$kodePembayaran = "";
-
-function generateKode($prefix)
-{
-    return $prefix . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT);
+$biayaAdmin = 0;
+if ($metodeDipilih === 'bca') {
+    $biayaAdmin = 1000;
+} elseif ($metodeDipilih === 'bri') {
+    $biayaAdmin = 1500;
+} elseif ($metodeDipilih === 'cod') {
+    $biayaAdmin = 0;
 }
+
+$status = 'sukses';
+$totalFinal = $total + $biayaAdmin;
+$nama_pembeli = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Anonim';
+
+$kodePembayaran = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && $metodeDipilih !== '') {
-    if ($metodeDipilih === 'bri') {
-        $biayaAdmin = 1500;
-        $kodePembayaran = generateKode('128');
-    } elseif ($metodeDipilih === 'bca') {
-        $biayaAdmin = 1000;
-        $kodePembayaran = generateKode('129');
-    } elseif ($metodeDipilih === 'cod') {
-        $biayaAdmin = 0;
-        $kodePembayaran = "";
+    $cekStok = mysqli_query($conn, "SELECT stock FROM produk WHERE id = $produk_id");
+    $dataStok = mysqli_fetch_assoc($cekStok);
+
+    if (!$dataStok) {
+        die("Produk tidak ditemukan di database.");
+    }
+
+    $stok_tersedia = (int)$dataStok['stock'];
+
+    if ($jumlah_post > $stok_tersedia) {
+        die("Stok tidak mencukupi untuk jumlah pembelian.");
+    }
+
+    $query = "INSERT INTO penjualan 
+    (produk_id, toko_id, nama_toko, nama_produk, jumlah, harga_satuan, total_harga, nama_pembeli, status , metode_pembayaran) 
+    VALUES 
+    ('$produk_id', '$toko_id', '$nama_toko', '$nama_produk', '$jumlah_post', '$harga', '$totalFinal', '$nama_pembeli','$status', '$metodeDipilih')";
+
+
+    $simpan = mysqli_query($conn, $query);
+
+    if ($simpan) {
+        $stok_baru = $stok_tersedia - $jumlah_post;
+        mysqli_query($conn, "UPDATE produk SET stock = $stok_baru WHERE id = $produk_id");
+
+        if ($metodeDipilih !== 'cod') {
+            $kodePembayaran = strtoupper(uniqid('PAY-'));
+        }
+        unset($_SESSION['produk_id'], $_SESSION['nama'], $_SESSION['store_id'], $_SESSION['nama_toko'], $_SESSION['harga'], $_SESSION['jumlah_beli']);
+        header('location: pengiriman.php');
     } else {
-        die("Metode pembayaran tidak valid.");
+        echo "Error saat menyimpan data penjualan: " . mysqli_error($conn);
     }
-
-    $totalFinal = $total + $biayaAdmin;
-    $nama_pembeli = $_SESSION['user_name'] ?? 'Anonim'; 
-
-    $status = 'sukses';
-
-    $sql = "INSERT INTO penjualan 
-            (produk_id, nama_produk, toko_id, nama_toko, harga_satuan, jumlah, total_harga, nama_pembeli, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-    $stmt = $conn->prepare($sql);
-    if (!$stmt) {
-        die("Prepare statement error: " . $conn->error);
-    }
-
-    $stmt->bind_param(
-        "isissdiss",
-        $produk_id,
-        $nama_produk,
-        $store_id,
-        $nama_toko,
-        $harga_satuan,
-        $jumlah_post,
-        $totalFinal,
-        $nama_pembeli,
-        $status
-    );
-
-    if ($stmt->execute()) {
-        $_SESSION['kode_pembayaran'] = $kodePembayaran;
-        $_SESSION['total_bayar'] = $totalFinal;
-        $_SESSION['metode_pembayaran'] = $metodeDipilih;
-
-        header("Location: pengiriman.php");
-        exit;
-    } else {
-        die("Error saat menyimpan data penjualan: " . $stmt->error);
-    }
-} else {
-    $totalFinal = $total; 
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">
@@ -159,28 +148,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $metodeDipilih !== '') {
             font-weight: 600;
             word-break: break-word;
         }
-
-        #jumlah_bayar {
-            width: 100%;
-            padding: 12px 15px;
-            font-size: 16px;
-            border: 2px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            margin-top: 8px;
-        }
-
-        #jumlah_bayar:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
-            outline: none;
-        }
-
-        #jumlah_bayar::placeholder {
-            color: #999;
-            font-style: italic;
-        }
     </style>
 </head>
 
@@ -190,25 +157,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $metodeDipilih !== '') {
 
         <div class="summary">
             <p>Total Harga Produk: <strong>Rp<?= number_format($total, 0, ',', '.') ?></strong></p>
-            <p>Biaya Admin: <strong id="biayaAdmin" data-total="<?= $total ?>"><?= 'Rp' . number_format($biayaAdmin, 0, ',', '.') ?></strong></p>
+            <p>Biaya Admin: <strong id="biayaAdmin" data-total="<?= $total ?>">Rp<?= number_format($biayaAdmin, 0, ',', '.') ?></strong></p>
             <hr>
             <p>Total Bayar: <strong id="totalBayar">Rp<?= number_format($totalFinal, 0, ',', '.') ?></strong></p>
         </div>
 
-        <form method="post" action="">
-            <input type="hidden" name="harga" value="<?= htmlspecialchars($harga) ?>">
-            <input type="hidden" name="jumlah" value="<?= htmlspecialchars($jumlah_post) ?>">
 
-            <label for="metode">Pilih Metode Pembayaran:</label>
-            <select name="metode" id="metode" required>
-                <option value="">-- Pilih Metode --</option>
-                <option value="bri" <?= $metodeDipilih === 'bri' ? 'selected' : '' ?>>BRI</option>
-                <option value="bca" <?= $metodeDipilih === 'bca' ? 'selected' : '' ?>>BCA</option>
-                <option value="cod" <?= $metodeDipilih === 'cod' ? 'selected' : '' ?>>COD</option>
-            </select>
+        <?php if (!$kodePembayaran && $metodeDipilih === ''): ?>
+            <form method="post" action="">
+                <input type="hidden" name="harga" value="<?= htmlspecialchars($harga) ?>">
+                <input type="hidden" name="jumlah" value="<?= htmlspecialchars($jumlah_post) ?>">
 
-            <button type="submit" id="btnProses" disabled>Proses</button>
-        </form>
+                <label for="metode">Pilih Metode Pembayaran:</label>
+                <select name="metode" id="metode" required>
+                    <option value="">-- Pilih Metode --</option>
+                    <option value="bri" <?= $metodeDipilih === 'bri' ? 'selected' : '' ?>>BRI</option>
+                    <option value="bca" <?= $metodeDipilih === 'bca' ? 'selected' : '' ?>>BCA</option>
+                    <option value="cod" <?= $metodeDipilih === 'cod' ? 'selected' : '' ?>>COD</option>
+                </select>
+
+                <button type="submit" id="btnProses">Proses</button>
+            </form>
+        <?php endif; ?>
 
         <?php if ($kodePembayaran): ?>
             <div id="kodePembayaran">
@@ -218,11 +188,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $metodeDipilih !== '') {
             <div id="kodePembayaran">
                 Anda memilih <strong>COD</strong>. Tidak ada kode pembayaran.
             </div>
-        <?php else: ?>
-            <div id="kodePembayaran" style="display:none;"></div>
         <?php endif; ?>
     </div>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
