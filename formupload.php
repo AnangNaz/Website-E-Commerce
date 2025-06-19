@@ -19,7 +19,7 @@
         }
 
         .btn-kembali {
-            background-color: #4CAF50;
+            background-color: #4300ff;
             color: white;
             padding: 10px 16px;
             border-radius: 6px;
@@ -29,7 +29,7 @@
         }
 
         .btn-kembali:hover {
-            background-color: #45a049;
+            background-color: #0118D8;
         }
 
         .form-container {
@@ -65,7 +65,7 @@
 
         form button {
             width: 100%;
-            background-color: #3498db;
+            background-color: #4300ff;
             color: white;
             padding: 12px;
             font-size: 16px;
@@ -77,7 +77,7 @@
         }
 
         form button:hover {
-            background-color: #2980b9;
+            background-color: #0118D8;
         }
 
         .secondary-button {

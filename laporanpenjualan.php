@@ -75,7 +75,7 @@ $result = $stmt_penjualan->get_result();
         }
 
         .btn-kembali {
-            background-color: #4CAF50;
+            background-color: #4300ff;
             color: white;
             padding: 10px 16px;
             border-radius: 6px;
@@ -85,7 +85,7 @@ $result = $stmt_penjualan->get_result();
         }
 
         .btn-kembali:hover {
-            background-color: #45a049;
+            background-color: #0118D8;
         }
 
         h2 {
@@ -111,15 +111,16 @@ $result = $stmt_penjualan->get_result();
         }
 
         form button {
-            background-color: #007bff;
+            background-color: #4300ff;
             color: white;
             border: none;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease;
+            font-weight: 600;
         }
 
         form button:hover {
-            background-color: #0056b3;
+            background-color: #0118D8;
         }
 
         table {
@@ -140,7 +141,7 @@ $result = $stmt_penjualan->get_result();
         }
 
         th {
-            background-color: #007bff;
+            background-color: #4300ff;
             color: white;
         }
 

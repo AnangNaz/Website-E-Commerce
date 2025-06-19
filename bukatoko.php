@@ -2,7 +2,6 @@
 session_start();
 include("koneksi.php");
 
-// Pastikan user sudah login
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
@@ -20,18 +19,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $logo = file_get_contents($_FILES['logo']['tmp_name']);
     }
 
-    // Prepare statement
     $stmt = $conn->prepare("INSERT INTO stores (user_id, nama_toko, deskripsi, logo) VALUES (?, ?, ?, ?)");
 
     if (!$stmt) {
         $pesan = "❌ Gagal mempersiapkan statement: " . $conn->error;
     } else {
-        // Bind params: 'i' untuk integer, 's' untuk string, 'b' untuk blob (logo)
         $stmt->bind_param("issb", $user_id, $nama_toko, $deskripsi, $null);
 
-        // Kirim data blob logo
         if ($logo !== null) {
-            // Send null placeholder first
             $stmt->send_long_data(3, $logo);
         }
 

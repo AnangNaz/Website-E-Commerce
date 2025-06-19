@@ -37,7 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->send_long_data(3, $gambar);
 
     if ($stmt->execute()) {
-        echo "✅ Produk berhasil diupload! <a href='index.php'>Lihat Dashboard</a>";
+        echo "✅ Produk berhasil diupload! ";
+        header('location: dashboardToko.php');
     } else {
         echo "❌ Gagal upload: " . $stmt->error;
     }

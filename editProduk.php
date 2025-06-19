@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .btn-kembali {
-            background-color: #4CAF50;
+            background-color: #4300ff;
             color: white;
             padding: 10px 16px;
             border-radius: 6px;
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .btn-kembali:hover {
-            background-color: #45a049;
+            background-color: #0118D8;
         }
 
         .form-container {
@@ -135,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         form input[type="submit"] {
             width: 100%;
-            background-color: #3498db;
+            background-color: #4300ff;
             color: white;
             padding: 12px;
             font-size: 16px;

@@ -92,7 +92,7 @@ $result = mysqli_query($conn, $query);
         }
 
         .btn-beli {
-            background-color: #4CAF50;
+            background-color: #4300ff;
             color: white;
             padding: 8px 16px;
             border: none;
@@ -103,7 +103,7 @@ $result = mysqli_query($conn, $query);
         }
 
         .btn-beli:hover {
-            background-color: #43a047;
+            background-color: #0118D8;
         }
 
         .info-pencarian {
@@ -117,7 +117,7 @@ $result = mysqli_query($conn, $query);
         }
 
         .btn-kembali {
-            background-color: #4CAF50;
+            background-color: #4300ff;
             color: white;
             padding: 8px 16px;
             border-radius: 6px;
@@ -127,7 +127,7 @@ $result = mysqli_query($conn, $query);
         }
 
         .btn-kembali:hover {
-            background-color: #45a049;
+            background-color: #0118D8;
         }
 
 
