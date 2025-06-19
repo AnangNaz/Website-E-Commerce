@@ -2,37 +2,72 @@
 include 'koneksi.php';
 session_start();
 
+// Inisialisasi jumlah_beli di session jika belum ada
 if (!isset($_SESSION['jumlah_beli'])) {
     $_SESSION['jumlah_beli'] = 1;
 }
 
+// Ambil produk_id dari POST atau session
 $produk_id = $_POST['produk_id'] ?? $_SESSION['produk_id'] ?? '';
-$nama = $_POST['nama'] ?? $_SESSION['nama'] ?? '';
-$harga = $_POST['harga'] ?? $_SESSION['harga'] ?? '';
 
+if (empty($produk_id)) {
+    die("ID produk kosong.");
+}
+
+// Pastikan produk_id adalah integer
+$produk_id = (int)$produk_id;
+
+// Simpan ke session agar bisa dipakai ulang
 $_SESSION['produk_id'] = $produk_id;
+
+// Jika ada input nama dan harga dari POST, simpan juga ke session
+$nama = $_POST['nama'] ?? $_SESSION['nama'] ?? '';
+$harga = $_POST['harga'] ?? $_SESSION['harga'] ?? '0';
+
+// Simpan nama dan harga ke session
 $_SESSION['nama'] = $nama;
 $_SESSION['harga'] = $harga;
 
+// Pastikan harga float
+$harga = (float)$harga;
+
+// Ambil jumlah beli dari session
 $jumlah_beli = $_SESSION['jumlah_beli'];
 
-$result = mysqli_query($conn, "SELECT stock, gambar, tipe_gambar, store_id FROM produk WHERE id = $produk_id");
+// Query produk berdasarkan produk_id
+$query = "SELECT stock, gambar, tipe_gambar, store_id FROM produk WHERE id = $produk_id";
+$result = mysqli_query($conn, $query);
+
+// Cek apakah query berhasil
+if (!$result) {
+    die("Query error: " . mysqli_error($conn));
+}
+
+// Ambil data produk
 $data = mysqli_fetch_assoc($result);
 
-$stok_db = $data['stock'];
+// Jika data produk tidak ditemukan, tampilkan pesan dan hentikan script
+if (!$data) {
+    die("Produk tidak ditemukan.");
+}
+
+// Ambil data stok dan gambar dari hasil query
+$stok_db = (int)$data['stock'];
 $stok_sisa = $stok_db - $jumlah_beli;
 $tipe = $data['tipe_gambar'];
 $img = base64_encode($data['gambar']);
 
+// Simpan store_id dan nama_toko ke session
 $_SESSION['store_id'] = $data['store_id'];
 
 $resultToko = mysqli_query($conn, "SELECT nama_toko FROM stores WHERE id = {$data['store_id']}");
 $dataToko = mysqli_fetch_assoc($resultToko);
 $_SESSION['nama_toko'] = $dataToko['nama_toko'] ?? '';
 
-$totalHarga = $_SESSION['harga'] * $jumlah_beli;
+// Hitung total harga
+$totalHarga = $harga * $jumlah_beli;
 
-
+// Tangani aksi tambah/kurang jumlah beli
 $alert = '';
 if (isset($_POST['aksi'])) {
     $aksi = $_POST['aksi'];
@@ -41,7 +76,7 @@ if (isset($_POST['aksi'])) {
         if ($_SESSION['jumlah_beli'] < $stok_db) {
             $_SESSION['jumlah_beli']++;
         } else {
-            $alert = 'Jumlah melebihi stok tersedia!';
+            $alert = "Jumlah melebihi stok tersedia!";
         }
     }
 
@@ -49,187 +84,113 @@ if (isset($_POST['aksi'])) {
         if ($_SESSION['jumlah_beli'] > 1) {
             $_SESSION['jumlah_beli']--;
         } else {
-            $alert = 'Jumlah minimal pembelian adalah 1.';
+            $alert = "Jumlah minimal pembelian adalah 1.";
         }
     }
 
+    // Redirect supaya alert muncul dan aksi di-refresh
     header("Location: pembayaran.php?alert=" . urlencode($alert));
     exit;
 }
 
+// Ambil pesan alert dari GET jika ada
+$alert = $_GET['alert'] ?? '';
 
-if (isset($_GET['alert'])) {
-    $alert = $_GET['alert'];
-}
+// Selanjutnya bisa tampilkan halaman pembayaran dengan data di atas
 ?>
 <!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8" />
-    <title>Pembayaran</title>
+    <title>Konfirmasi Pembelian</title>
     <style>
-        body {
-            background: #f4f4f4;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .container {
-            width: 420px;
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-            padding: 10px 18px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 15px;
-            display: inline-block;
-            margin-bottom: 20px;
-            transition: background-color 0.3s ease;
-            user-select: none;
-        }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
+        .alert {
+            color: red;
+            margin-bottom: 1em;
         }
 
         .card {
-            background: #fff;
-            padding: 30px 25px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: auto;
+            padding: 1em;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
         }
 
         .card img {
             max-width: 100%;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .info p {
-            margin: 8px 0;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .stok-area {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin: 20px 0;
-        }
-
-        .stok-area form {
-            display: inline;
+            height: auto;
+            margin-bottom: 1em;
         }
 
         .btn {
-            padding: 8px 14px;
-            border: none;
-            border-radius: 6px;
+            display: inline-block;
+            padding: 0.5em 1em;
+            margin: 0.5em 0.2em;
+            font-size: 1rem;
             cursor: pointer;
-            font-weight: bold;
-            font-size: 18px;
-            user-select: none;
+            border: none;
+            border-radius: 4px;
         }
 
         .btn-tambah {
-            background: #28a745;
+            background-color: #4CAF50;
             color: white;
         }
 
         .btn-kurang {
-            background: #dc3545;
+            background-color: #f44336;
             color: white;
         }
 
         .btn-bayar {
-            width: 100%;
-            background: #007bff;
+            background-color: #4300FF;
             color: white;
-            padding: 14px;
-            font-size: 18px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-bayar:hover {
-            background: #0056b3;
-        }
-
-        .alert {
-            background: #ffe0e0;
-            color: #c00;
-            padding: 12px;
-            margin-bottom: 20px;
-            border-radius: 6px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .jumlah-text {
-            font-size: 20px;
-            font-weight: 600;
-            width: 40px;
-            text-align: center;
-            user-select: none;
+            width: 100%;
+            font-weight: bold;
+            margin-top: 1em;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <a href="index.php" class="btn-secondary">← Kembali ke Homepage</a>
 
-        <div class="card">
-            <h2>Konfirmasi Pembelian</h2>
+    <div class="card">
+        <h2>Konfirmasi Pembelian</h2>
 
-            <?php if ($alert): ?>
-                <div class="alert"><?= htmlspecialchars($alert) ?></div>
-            <?php endif; ?>
+        <?php if ($alert): ?>
+            <div class="alert"><?= htmlspecialchars($alert) ?></div>
+        <?php endif; ?>
 
-            <img src="data:<?= $tipe ?>;base64,<?= $img ?>" alt="<?= htmlspecialchars($nama) ?>" />
-            <div class="info">
-                <p><strong>Nama Produk:</strong> <?= htmlspecialchars($nama) ?></p>
-                <p><strong>Harga per item:</strong> IDR <?= number_format($harga) ?></p>
-                <p><strong>Sisa Stok:</strong> <?= $stok_sisa ?></p>
-                <p><strong>Jumlah yang dibeli:</strong> <?= $jumlah_beli ?></p>
-                <p><strong>Total Bayar:</strong> <b>IDR <?= number_format($jumlah_beli * $harga) ?></b></p>
-            </div>
+        <img src="data:<?= htmlspecialchars($tipe) ?>;base64,<?= $img ?>" alt="<?= htmlspecialchars($nama) ?>" />
 
-            <div class="stok-area">
-                <form method="post">
-                    <input type="hidden" name="aksi" value="kurang" />
-                    <button class="btn btn-kurang" type="submit">−</button>
-                </form>
+        <p><strong>Nama Produk:</strong> <?= htmlspecialchars($nama) ?></p>
+        <p><strong>Harga per item:</strong> IDR <?= number_format($harga, 2, ',', '.') ?></p>
+        <p><strong>Sisa Stok:</strong> <?= $stok_sisa ?></p>
+        <p><strong>Jumlah yang dibeli:</strong> <?= $jumlah_beli ?></p>
+        <p><strong>Total Bayar:</strong> <b>IDR <?= number_format($totalHarga, 2, ',', '.') ?></b></p>
 
-                <span class="jumlah-text"><?= $jumlah_beli ?></span>
+        <form action="pembayaran.php" method="post" style="display:inline;">
+            <input type="hidden" name="produk_id" value="<?= $produk_id ?>">
+            <input type="hidden" name="aksi" value="kurang">
+            <button type="submit" class="btn btn-kurang">- Kurangi</button>
+        </form>
 
-                <form method="post">
-                    <input type="hidden" name="aksi" value="tambah" />
-                    <button class="btn btn-tambah" type="submit">+</button>
-                </form>
-            </div>
+        <form action="pembayaran.php" method="post" style="display:inline;">
+            <input type="hidden" name="produk_id" value="<?= $produk_id ?>">
+            <input type="hidden" name="aksi" value="tambah">
+            <button type="submit" class="btn btn-tambah">+ Tambah</button>
+        </form>
 
-            <form action="prosesBayar.php" method="post">
-                <input type="hidden" name="produk_id" value="<?= $produk_id ?>" />
-                <input type="hidden" name="harga" value="<?= $harga ?>" />
-                <input type="hidden" name="jumlah" value="<?= $jumlah_beli ?>" />
-                <button type="submit" class="btn-bayar">Bayar Sekarang</button>
-            </form>
-
-        </div>
+        <form action="prosesBayar.php" method="post">
+            <input type="hidden" name="produk_id" value="<?= $produk_id ?>">
+            <input type="hidden" name="jumlah_beli" value="<?= $jumlah_beli ?>">
+            <button type="submit" class="btn btn-bayar">Bayar Sekarang</button>
+        </form>
     </div>
+
 </body>
 
 </html>

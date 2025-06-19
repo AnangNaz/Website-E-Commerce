@@ -31,6 +31,90 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
 
   <!-- Custom CSS file -->
   <link rel="stylesheet" href="style.css">
+
+  <style>
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #333;
+      position: relative;
+    }
+
+    .section-title::after {
+      content: '';
+      width: 60px;
+      height: 3px;
+      background: #007bff;
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      border-radius: 5px;
+    }
+
+    .product-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #fff;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease;
+      height: 400px;
+      max-width: 220px;
+      margin: auto;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .product-card h6 {
+      font-size: 16px;
+      margin: 10px 0 5px;
+      color: #555;
+      min-height: 40px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .product-card .price,
+    .product-card .stock,
+    .product-card form,
+    .product-card button {
+      margin-top: 5px;
+    }
+
+
+    #filters .btn {
+      margin: 0 5px 10px 0;
+      border-radius: 30px;
+      background-color: #eee;
+      color: #333;
+      transition: all 0.2s ease;
+    }
+
+    #filters .btn:hover,
+    #filters .btn.is-checked {
+      background-color: #4300FF;
+      color: white;
+    }
+
+    #cart {
+      background-color: #4300FF;
+      color: white;
+    }
+  </style>
+
 </head>
 
 <body>
@@ -38,9 +122,9 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
   <!-- start #header -->
   <header id="header">
     <div class="strip d-flex justify-content-between px-4 py-1 bg-light">
-      <p class="font-rale font-size-12 text-black-50 m-0">Jordan Calderon 430-985 Eleifend St. Duluth Washington 92611 (427) 930-5255</p>
+      <p class="font-rale font-size-12 text-black-50 m-0">Jl Raya Serang Banten</p>
       <div class="font-rale font-size-14">
-        <a href="#" class="px-3 border-right border-left text-dark">Login</a>
+        <a href="login.php" class="px-3 border-right border-left text-dark">Login</a>
         <a href="#" class="px-3 border-right text-dark">Whishlist (0)</a>
       </div>
     </div>
@@ -102,15 +186,14 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
     <section id="top-sale">
       <div class="container py-5">
         <?php
-        $conn = new mysqli("localhost", "root", "", "ecomm");
-
+        $conn = new mysqli("localhost", "root", "Anangnaz", "ecomm");
         $toko_result = $conn->query("SELECT id, nama_toko FROM stores");
 
         while ($store = $toko_result->fetch_assoc()) {
           $store_id = $store['id'];
           $nama_toko = $store['nama_toko'];
 
-          echo "<h4 class='font-rubik font-size-20'>$nama_toko</h4><hr>";
+          echo "<h4 class='section-title'>$nama_toko</h4>";
           echo '<div class="owl-carousel owl-theme">';
 
           $produk_result = $conn->query("SELECT * FROM produk WHERE store_id = $store_id");
@@ -121,37 +204,28 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
             $stok = $row['stock'];
         ?>
             <div class="item py-2">
-              <div class="product font-rale">
-                <div class="d-flex flex-column">
-                  <a href="#"><img src="data:<?php echo $tipe; ?>;base64,<?php echo $img; ?>" alt="<?php echo $row['nama']; ?>" class="img-fluid"></a>
-                  <div class="text-center">
-                    <h6><?php echo $row['nama']; ?></h6>
-                    <div class="rating text-warning font-size-12">
-                      <?php for ($i = 0; $i < 5; $i++) {
-                        echo '<span><i class="' . ($i < $row['rating'] ? 'fas' : 'far') . ' fa-star"></i></span>';
-                      } ?>
-                    </div>
-                    <div class="price py-2">
-                      <span>IDR<?php echo $row['harga']; ?></span>
-                    </div>
-                    <div class="stock py-1 text-secondary">
-                      Stok: <?php echo $stok; ?>
-                    </div>
-
-                    <?php if ($stok >= 1) { ?>
-                      <!-- Tombol aktif jika stok mencukupi -->
-                      <form action="pembayaran.php" method="post">
-                        <input type="hidden" name="produk_id" value="<?php echo $row['id']; ?>">
-                        <input type="hidden" name="nama" value="<?php echo $row['nama']; ?>">
-                        <input type="hidden" name="harga" value="<?php echo $row['harga']; ?>">
-                        <button type="submit" class="btn btn-warning font-size-12">Add to Cart</button>
-                      </form>
-                    <?php } else { ?>
-                      <!-- Tombol nonaktif jika stok habis -->
-                      <button class="btn btn-secondary font-size-12" disabled>Stok Habis</button>
-                    <?php } ?>
-                  </div>
+              <div class="product-card">
+                <a href="#">
+                  <img src="data:<?php echo $tipe; ?>;base64,<?php echo $img; ?>" alt="<?php echo $row['nama']; ?>" class="img-fluid" style="height: 180px; object-fit: cover;">
+                </a>
+                <h6><?php echo $row['nama']; ?></h6>
+                <div class="rating text-warning font-size-12">
+                  <?php for ($i = 0; $i < 5; $i++) {
+                    echo '<span><i class="' . ($i < $row['rating'] ? 'fas' : 'far') . ' fa-star"></i></span>';
+                  } ?>
                 </div>
+                <div class="price py-1">IDR <?php echo number_format($row['harga'], 0, ',', '.'); ?></div>
+                <div class="stock py-1">Stok: <?php echo $stok; ?></div>
+                <?php if ($stok >= 1) { ?>
+                  <form action="pembayaran.php" method="post">
+                    <input type="hidden" name="produk_id" value="<?php echo $row['id']; ?>">
+                    <input type="hidden" name="nama" value="<?php echo $row['nama']; ?>">
+                    <input type="hidden" name="harga" value="<?php echo $row['harga']; ?>">
+                    <button type="submit" id="cart" class="btn font-size-12 mt-2">Add to Cart</button>
+                  </form>
+                <?php } else { ?>
+                  <button class="btn btn-secondary font-size-12 mt-2" disabled>Stok Habis</button>
+                <?php } ?>
               </div>
             </div>
         <?php
@@ -163,17 +237,16 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
       </div>
     </section>
 
+
     <!-- !Top Sale per Toko -->
 
     <!-- Special Price -->
     <section id="special-price">
-      <div class="container">
-        <h4 class="font-rubik font-size-20">Special Price</h4>
+      <div class="container py-5">
+        <h4 class="section-title">Special Price</h4>
 
-        <!-- Filter Buttons -->
-        <div id="filters" class="button-group text-right font-baloo font-size-16">
+        <div id="filters" class="button-group text-right font-baloo font-size-16 mb-3">
           <button class="btn is-checked" data-filter="*">Semua Toko</button>
-
           <?php
           include 'koneksi.php';
           $queryToko = mysqli_query($conn, "SELECT DISTINCT nama_toko FROM stores");
@@ -184,37 +257,34 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
           ?>
         </div>
 
-        <!-- Produk Grid -->
         <div class="grid">
           <?php
           $queryProduk = mysqli_query($conn, "
-    SELECT produk.*, stores.nama_toko 
-    FROM produk 
-    JOIN stores ON produk.store_id = stores.id
-  ");
+        SELECT produk.*, stores.nama_toko 
+        FROM produk 
+        JOIN stores ON produk.store_id = stores.id
+      ");
 
           while ($produk = mysqli_fetch_assoc($queryProduk)) {
             $namaToko = strtolower(str_replace(' ', '-', $produk['nama_toko']));
-
             echo "
-      <div class='grid-item border $namaToko'>
-        <div class='item py-2' style='width: 200px;'>
-          <div class='product font-rale'>
-            <img src='tampilGambar.php?id={$produk['id']}' class='img-fluid' alt='{$produk['nama']}'>
-            <h6>{$produk['nama']}</h6>
-            <div class='price py-2'>
-              <span>Rp " . number_format($produk['harga'], 0, ',', '.') . "</span>
+        <div class='grid-item border $namaToko' style='margin: 10px; border-radius: 10px;'>
+          <div class='item py-2' style='width: 200px;'>
+            <div class='product-card font-rale text-center'>
+              <img src='tampilGambar.php?id={$produk['id']}' class='img-fluid'  alt='{$produk['nama']}'>
+              <h6>{$produk['nama']}</h6>
+              <div class='price py-2'>
+                <span>Rp " . number_format($produk['harga'], 0, ',', '.') . "</span>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-      ";
+        </div>";
           }
           ?>
         </div>
       </div>
-      </div>
     </section>
+
 
     <!-- !Special Price -->
 
