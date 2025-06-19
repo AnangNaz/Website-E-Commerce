@@ -170,7 +170,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="email" name="email" id="email" required />
 
             <label for="password">Password</label>
-            <input type="password" name="password" id="password" required />
+            <input type="password" name="password" id="password" required>
+            <a href="resetPassword.php">Lupa Password?</a>
+            </p>
 
             <input type="submit" value="Masuk" />
         </form>
