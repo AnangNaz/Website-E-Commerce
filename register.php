@@ -12,12 +12,13 @@ if ($conn->connect_error) {
     die("Koneksi gagal: " . $conn->connect_error);
 }
 
-if (isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password']) && isset($_POST['no_telp'])) {
-    $nama = $_POST['name'];
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-    $no_telp = $_POST['no_telp']; 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nama = trim($_POST['name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+    $no_telp = trim($_POST['no_telp'] ?? '');
 
+    // Validasi
     if (empty($nama)) {
         $error[] = 'Nama harus diisi.';
     }
@@ -35,60 +36,176 @@ if (isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password'])
         $error[] = 'Nomor telepon hanya boleh terdiri dari angka.';
     }
 
+    // Cek duplikat email & no_telp
     if (empty($error)) {
-        $query_check_email = "SELECT * FROM user WHERE email = ?";
-        $stmt_check_email = $conn->prepare($query_check_email);
-        if ($stmt_check_email === false) {
-            $error[] = 'Gagal mempersiapkan statement: ' . $conn->error;
-        } else {
-            $stmt_check_email->bind_param("s", $email);
-            $stmt_check_email->execute();
-            $result_check_email = $stmt_check_email->get_result();
-
-            if ($result_check_email->num_rows > 0) {
-                $error[] = 'Email sudah terdaftar.';
-            } else {
-                $query_check_no_telp = "SELECT * FROM user WHERE no_telp = ?";
-                $stmt_check_no_telp = $conn->prepare($query_check_no_telp);
-                if ($stmt_check_no_telp === false) {
-                    $error[] = 'Gagal mempersiapkan statement: ' . $conn->error;
-                } else {
-                    $stmt_check_no_telp->bind_param("s", $no_telp);
-                    $stmt_check_no_telp->execute();
-                    $result_check_no_telp = $stmt_check_no_telp->get_result();
-
-                    if ($result_check_no_telp->num_rows > 0) {
-                        $error[] = 'Nomor telepon sudah terdaftar.';
-                    } else {
-                        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                        $query = "INSERT INTO user (nama, email, password, no_telp) VALUES (?, ?, ?, ?)";
-                        $stmt = $conn->prepare($query);
-                        if ($stmt === false) {
-                            $error[] = 'Gagal mempersiapkan statement: ' . $conn->error;
-                        } else {
-                            $stmt->bind_param("ssss", $nama, $email, $hashed_password, $no_telp);
-
-                            if ($stmt->execute()) {
-                                $pesan = "Registrasi berhasil! Silakan login.";
-                            } else {
-                                $error[] = 'Terjadi kesalahan saat menyimpan data: ' . $stmt->error;
-                            }
-                            $stmt->close();
-                        }
-                    }
-                    $stmt_check_no_telp->close();
-                }
-            }
-            $stmt_check_email->close();
+        $stmt = $conn->prepare("SELECT id FROM user WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $error[] = 'Email sudah terdaftar.';
         }
+        $stmt->close();
     }
-    $_SESSION['error'] = $error;
-    $_SESSION['pesan'] = $pesan;
-    $_SESSION['nama'] = $nama;
-    $_SESSION['email'] = $email;
-    $_SESSION['no_telp'] = $no_telp; 
-}
 
-header("Location: login.php");
-exit();
+    if (empty($error)) {
+        $stmt = $conn->prepare("SELECT id FROM user WHERE no_telp = ?");
+        $stmt->bind_param("s", $no_telp);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $error[] = 'Nomor telepon sudah terdaftar.';
+        }
+        $stmt->close();
+    }
+
+    // Insert data jika validasi lolos
+    if (empty($error)) {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $conn->prepare("INSERT INTO user (nama, email, password, no_telp) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $nama, $email, $hashed_password, $no_telp);
+        if ($stmt->execute()) {
+            $_SESSION['pesan'] = "Registrasi berhasil! Silakan login.";
+            header("Location: login.php");
+            exit();
+        } else {
+            $error[] = "Terjadi kesalahan saat menyimpan data: " . $stmt->error;
+        }
+        $stmt->close();
+    }
+
+    if (!empty($error)) {
+        $_SESSION['error'] = $error;
+        $_SESSION['nama'] = $nama;
+        $_SESSION['email'] = $email;
+        $_SESSION['no_telp'] = $no_telp;
+        header("Location: register.php");
+        exit();
+    }
+}
 ?>
+
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Register</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 400px;
+            background: white;
+            margin: 80px auto;
+            padding: 30px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .error {
+            color: red;
+            background-color: #ffeaea;
+            border-left: 4px solid red;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 15px;
+            text-align: center;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>🔐 Registrasi Pengguna</h2>
+
+        <?php
+        if (!empty($_SESSION['error'])) {
+            echo '<div class="error"><ul>';
+            foreach ($_SESSION['error'] as $e) {
+                echo '<li>' . htmlspecialchars($e) . '</li>';
+            }
+            echo '</ul></div>';
+            unset($_SESSION['error']);
+        }
+        ?>
+
+        <form action="register.php" method="POST">
+            <label for="name">Nama</label>
+            <input type="text" name="name" id="name" required value="<?= htmlspecialchars($_SESSION['nama'] ?? '') ?>" />
+
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" required value="<?= htmlspecialchars($_SESSION['email'] ?? '') ?>" />
+
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" required />
+
+            <label for="no_telp">Nomor Telepon</label>
+            <input type="text" name="no_telp" id="no_telp" required value="<?= htmlspecialchars($_SESSION['no_telp'] ?? '') ?>" />
+
+            <input type="submit" value="Daftar" />
+        </form>
+
+        <a class="back-link" href="login.php">Sudah punya akun? Login di sini</a>
+    </div>
+    <?php
+    // Hapus data session input setelah form tampil
+    unset($_SESSION['nama'], $_SESSION['email'], $_SESSION['no_telp']);
+    ?>
+</body>
+
+</html>

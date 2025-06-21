@@ -8,7 +8,7 @@ if (!isset($_SESSION['produk_id'], $_SESSION['nama'], $_SESSION['store_id'], $_S
 
 $produk_id = $_SESSION['produk_id'];
 $nama_produk = $_SESSION['nama'];
-$toko_id = $_SESSION['store_id']; 
+$toko_id = $_SESSION['store_id'];
 $nama_toko = $_SESSION['nama_toko'];
 $harga_satuan = $_SESSION['harga'];
 $jumlah = $_SESSION['jumlah_beli'];
@@ -80,24 +80,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $metodeDipilih !== '') {
     <title>Proses Pembayaran</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
             padding: 30px;
-            background-color: #f9f9f9;
+            margin: 0;
         }
 
         .container {
             max-width: 420px;
-            margin: auto;
-            background: #fff;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+            margin: 30px auto;
+            background: #ffffff;
+            padding: 25px 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(246, 139, 30, 0.15);
+            /* warna oranye semi transparan */
+            border: 1px solid #fbe4c9;
+            /* warna border oranye terang */
         }
 
         h2 {
             text-align: center;
             margin-bottom: 25px;
-            color: #007bff;
+            color: #4300FF;
+            /* oranye */
+            font-weight: 700;
         }
 
         label {
@@ -105,50 +111,99 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $metodeDipilih !== '') {
             display: block;
             margin-bottom: 8px;
             margin-top: 20px;
+            color: #7a4e00;
+            /* oranye gelap */
+            font-size: 15px;
         }
 
         select,
         button {
             width: 100%;
-            padding: 12px;
+            padding: 12px 15px;
             font-size: 16px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
+            border-radius: 8px;
+            border: 1.8px solid #4300FF;
+            /* oranye */
             box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        select:focus,
+        button:focus {
+            outline: none;
+            border-color: #4300FF;
+            /* oranye lebih gelap */
+            box-shadow: 0 0 8px rgba(199, 108, 0, 0.5);
         }
 
         button {
             margin-top: 25px;
-            background-color: #007bff;
+            background-color: #4300FF;
+            /* oranye */
             color: white;
             font-weight: 700;
             border: none;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            user-select: none;
+            box-shadow: 0 4px 8px rgba(246, 139, 30, 0.4);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: #0118D8;
+            /* oranye gelap */
+            box-shadow: 0 6px 15px rgba(199, 108, 0, 0.6);
         }
 
         .summary p {
             font-size: 16px;
             margin: 10px 0;
+            color: #5a3900;
+            /* oranye gelap */
         }
 
         .summary strong {
-            color: #333;
+            font-weight: 700;
         }
 
         #kodePembayaran {
-            background-color: #e1f0ff;
-            border-left: 5px solid #007bff;
-            padding: 15px;
+            background-color: #fff3e0;
+            /* oranye sangat terang */
+            border-left: 6px solid ;
+            padding: 18px 20px;
             margin-top: 30px;
-            font-weight: 600;
+            font-weight: 700;
+            color: #7a4e00;
             word-break: break-word;
+            border-radius: 6px;
+            box-shadow: 0 3px 10px rgba(246, 139, 30, 0.15);
+        }
+
+        #jumlah_bayar {
+            border: 1.8px solid #4300FF;
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 8px;
+            margin-bottom: 10px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #jumlah_bayar:focus {
+            outline: none;
+            border-color: #;
+            box-shadow: 0 0 8px rgba(199, 108, 0, 0.5);
+        }
+
+        #notifBayar {
+            font-weight: 700;
+            margin-top: 10px;
         }
     </style>
+
+
 </head>
 
 <body>
@@ -238,6 +293,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $metodeDipilih !== '') {
                 jumlahBayarInput.attr('min', totalFinal);
                 checkBayar();
             }
+
+            
 
             function checkBayar() {
                 const metode = metodeSelect.val();
