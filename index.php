@@ -186,7 +186,7 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
     <section id="top-sale">
       <div class="container py-5">
         <?php
-        $conn = new mysqli("localhost", "root", "Anangnaz", "ecomm");
+        $conn = new mysqli("localhost", "root", "", "ecomm");
         $toko_result = $conn->query("SELECT id, nama_toko FROM stores");
 
         while ($store = $toko_result->fetch_assoc()) {
