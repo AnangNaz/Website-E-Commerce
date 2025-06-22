@@ -7,6 +7,7 @@ $pesan = '';
 $nama = '';
 $email = '';
 $no_telp = '';
+$kecamatan='';
 
 if ($conn->connect_error) {
     die("Koneksi gagal: " . $conn->connect_error);
@@ -17,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
     $no_telp = trim($_POST['no_telp'] ?? '');
+    $kecamatan = $_POST['kecamatan'] ?? '';
 
     // Validasi
     if (empty($nama)) {
@@ -35,6 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!preg_match('/^[0-9]+$/', $no_telp)) {
         $error[] = 'Nomor telepon hanya boleh terdiri dari angka.';
     }
+    if (empty($kecamatan)) {
+    $error[] = 'Kecamatan harus dipilih.';
+}
 
     // Cek duplikat email & no_telp
     if (empty($error)) {
@@ -60,10 +65,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Insert data jika validasi lolos
-    if (empty($error)) {
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $conn->prepare("INSERT INTO user (nama, email, password, no_telp) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $nama, $email, $hashed_password, $no_telp);
+if (empty($error)) {
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    $stmt = $conn->prepare("INSERT INTO user (nama, email, password, no_telp, kecamatan) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssss", $nama, $email, $hashed_password, $no_telp, $kecamatan);
         if ($stmt->execute()) {
             $_SESSION['pesan'] = "Registrasi berhasil! Silakan login.";
             header("Location: login.php");
@@ -79,6 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['nama'] = $nama;
         $_SESSION['email'] = $email;
         $_SESSION['no_telp'] = $no_telp;
+        $_SESSION['kecamatan'] = $kecamatan;
         header("Location: register.php");
         exit();
     }

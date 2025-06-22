@@ -5,13 +5,10 @@ $error = $_SESSION['error'] ?? [];
 $pesan = $_SESSION['pesan'] ?? '';
 $nama = $_SESSION['nama'] ?? '';
 $email = $_SESSION['email'] ?? '';
-$no_telp = $_SESSION['no_telp'] ?? ''; 
+$no_telp = $_SESSION['no_telp'] ?? '';
+$kecamatan = $_SESSION['kecamatan'] ?? '';
 
-unset($_SESSION['error']);
-unset($_SESSION['pesan']);
-unset($_SESSION['nama']);
-unset($_SESSION['email']);
-unset($_SESSION['no_telp']);
+unset($_SESSION['error'], $_SESSION['pesan'], $_SESSION['nama'], $_SESSION['email'], $_SESSION['no_telp'], $_SESSION['kecamatan']);
 ?>
 
 <!DOCTYPE html>
@@ -49,6 +46,7 @@ unset($_SESSION['no_telp']);
                        aria-required="true" aria-invalid="<?= !empty($error) && empty($nama) ? 'true' : 'false' ?>"
                        placeholder="Masukkan nama lengkap Anda">
             </div>
+
             <div class="form-group">
                 <label for="email">Alamat Email</label>
                 <input type="email" id="email" name="email" required
@@ -56,18 +54,34 @@ unset($_SESSION['no_telp']);
                        aria-required="true" aria-invalid="<?= !empty($error) && (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) ? 'true' : 'false' ?>"
                        placeholder="contoh@mail.com">
             </div>
+
             <div class="form-group">
                 <label for="password">Kata Sandi</label>
                 <input type="password" id="password" name="password" required
                        aria-required="true"
                        placeholder="Minimal 8 karakter">
             </div>
+
             <div class="form-group">
                 <label for="no_telp">Nomor Telepon</label>
                 <input type="text" id="no_telp" name="no_telp" required
                        value="<?= htmlspecialchars($no_telp ?? '') ?>"
                        aria-required="true" aria-invalid="<?= !empty($error) && empty($no_telp) ? 'true' : 'false' ?>"
                        placeholder="Masukkan nomor telepon Anda">
+            </div>
+
+            <div class="form-group">
+                <label for="kecamatan">Kecamatan</label>
+                <select name="kecamatan" id="kecamatan" required>
+                    <option value="">-- Pilih Kecamatan --</option>
+                    <?php
+                    $daftar_kecamatan = ['Taktakan', 'Cipocok Jaya', 'Kasemen', 'Serang', 'Walantaka'];
+                    foreach ($daftar_kecamatan as $kcmt) {
+                        $selected = $kcmt === $kecamatan ? 'selected' : '';
+                        echo "<option value=\"$kcmt\" $selected>$kcmt</option>";
+                    }
+                    ?>
+                </select>
             </div>
 
             <button type="submit" class="button-submit" aria-label="Daftar akun baru">Daftar</button>

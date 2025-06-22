@@ -33,6 +33,7 @@ $produk_result = $conn->query("SELECT * FROM produk WHERE store_id = $store_id")
     <meta charset="UTF-8">
     <title>Dashboard Toko</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+      <link rel="stylesheet" href="style.css">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
