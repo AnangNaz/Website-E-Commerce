@@ -349,6 +349,58 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
 
   <!-- Custom Javascript -->
   <script src="index.js"></script>
+
+  <footer>
+    <div class="footer-grid">
+
+      <!-- Baris 1 -->
+      <div class="footer-section">
+        <h4>Home</h4>
+        <ul>
+          <li><a href="index.php">Beranda</a></li>
+          <li><a href="#">Tentang Kami</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Karir</a></li>
+          <li><a href="#">Kontak</a></li>
+        </ul>
+      </div>
+
+      <!-- Baris 2 -->
+      <div class="footer-section">
+        <h4>TokoSaya</h4>
+        <ul>
+          <li><a href="dashboardToko.php">Produk</a></li>
+          <li><a href="#">Kategori</a></li>
+          <li><a href="#">Promo</a></li>
+          <li><a href="#">Keranjang</a></li>
+          <li><a href="#">Riwayat</a></li>
+        </ul>
+      </div>
+
+      <!-- Baris 3 -->
+      <div class="footer-section">
+        <h4>Pasar</h4>
+        <ul>
+          <li><a href="#">Lapak Terbaru</a></li>
+          <li><a href="#">Paling Dicari</a></li>
+          <li><a href="#">Pasar Rakyat</a></li>
+          <li><a href="#">Pasar Digital</a></li>
+          <li><a href="#">Pasar Lokal</a></li>
+        </ul>
+      </div>
+
+      <!-- Baris 4: Kolom Pencarian -->
+     <div class="footer-section search-section">
+        <h4>Cari Sesuatu</h4>
+        <form action="pencarian.php" method="GET">
+            <input type="text" name="q" placeholder="Cari di sini..." required>
+            <button type="submit">Cari</button>
+        </form>
+    </div>
+
+    </div>
+  </footer>
+
 </body>
 
 </html>
