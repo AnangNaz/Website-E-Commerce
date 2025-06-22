@@ -28,8 +28,24 @@ if ($metodeDipilih === 'bca') {
     $biayaAdmin = 0;
 }
 
-$status = 'sukses';
-$totalFinal = $total + $biayaAdmin;
+$status = 'sukses';// Ambil kecamatan toko
+$queryToko = mysqli_query($conn, "SELECT kecamatan_toko FROM stores WHERE id = $toko_id");
+$dataToko = mysqli_fetch_assoc($queryToko);
+$kecamatanToko = $dataToko['kecamatan_toko'] ?? '';
+
+// Ambil kecamatan pembeli
+$queryUser = mysqli_query($conn, "SELECT kecamatan FROM user WHERE id = {$_SESSION['user_id']}");
+$dataUser = mysqli_fetch_assoc($queryUser);
+$kecamatanPembeli = $dataUser['kecamatan'] ?? '';
+
+// Ambil biaya ongkir
+$queryOngkir = mysqli_query($conn, "SELECT biaya FROM ongkir WHERE asal_kecamatan = '$kecamatanToko' AND tujuan_kecamatan = '$kecamatanPembeli'");
+$dataOngkir = mysqli_fetch_assoc($queryOngkir);
+$ongkir = $dataOngkir['biaya'] ?? 0;
+
+// Total akhir
+$totalFinal = $total + $biayaAdmin + $ongkir;
+
 $nama_pembeli = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Anonim';
 
 $kodePembayaran = '';
@@ -48,10 +64,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $metodeDipilih !== '') {
         die("Stok tidak mencukupi untuk jumlah pembelian.");
     }
 
-    $query = "INSERT INTO penjualan 
-    (produk_id, toko_id, nama_toko, nama_produk, jumlah, harga_satuan, total_harga, nama_pembeli, status , metode_pembayaran) 
-    VALUES 
-    ('$produk_id', '$toko_id', '$nama_toko', '$nama_produk', '$jumlah_post', '$harga', '$totalFinal', '$nama_pembeli','$status', '$metodeDipilih')";
+ $query = "INSERT INTO penjualan 
+(produk_id, toko_id, nama_toko, nama_produk, jumlah, harga_satuan, total_harga, nama_pembeli, status , metode_pembayaran, ongkir) 
+VALUES 
+('$produk_id', '$toko_id', '$nama_toko', '$nama_produk', '$jumlah_post', '$harga', '$totalFinal', '$nama_pembeli','$status', '$metodeDipilih', '$ongkir')";
+
 
 
     $simpan = mysqli_query($conn, $query);
@@ -193,7 +210,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $metodeDipilih !== '') {
 
         #jumlah_bayar:focus {
             outline: none;
-            border-color: #;
+            border-color: #ffffff;
             box-shadow: 0 0 8px rgba(199, 108, 0, 0.5);
         }
 
@@ -212,9 +229,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $metodeDipilih !== '') {
 
         <div class="summary">
             <p>Total Harga Produk: <strong>Rp<?= number_format($total, 0, ',', '.') ?></strong></p>
-            <p>Biaya Admin: <strong id="biayaAdmin" data-total="<?= $total ?>">Rp<?= number_format($biayaAdmin, 0, ',', '.') ?></strong></p>
+            <p>Ongkos Kirim: <strong>Rp<?= number_format($ongkir, 0, ',', '.') ?></strong></p>
+            <p>Biaya Admin: <strong id="biayaAdmin" data-total="<?= $total + $ongkir ?>">Rp<?= number_format($biayaAdmin, 0, ',', '.') ?></strong></p>
             <hr>
             <p>Total Bayar: <strong id="totalBayar">Rp<?= number_format($totalFinal, 0, ',', '.') ?></strong></p>
+
         </div>
 
 

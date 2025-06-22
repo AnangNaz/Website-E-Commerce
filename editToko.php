@@ -11,13 +11,14 @@ if (!$toko_id) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nama_toko = $_POST['nama_toko'];
+    $kecamatan = $_POST['kecamatan'];
     $deskripsi = $_POST['deskripsi'];
 
     if ($_FILES['logo']['size'] > 0) {
         $logo = addslashes(file_get_contents($_FILES['logo']['tmp_name']));
-        $sql = "UPDATE stores SET nama_toko='$nama_toko', deskripsi='$deskripsi', logo='$logo' WHERE id=$toko_id";
+        $sql = "UPDATE stores SET nama_toko='$nama_toko', kecamatan_toko='$kecamatan', deskripsi='$deskripsi', logo='$logo' WHERE id=$toko_id";
     } else {
-        $sql = "UPDATE stores SET nama_toko='$nama_toko', deskripsi='$deskripsi' WHERE id=$toko_id";
+        $sql = "UPDATE stores SET nama_toko='$nama_toko', kecamatan_toko='$kecamatan', deskripsi='$deskripsi' WHERE id=$toko_id";
     }
 
     if ($conn->query($sql) === TRUE) {
@@ -68,6 +69,7 @@ $data = $query->fetch_assoc();
         }
 
         input[type="text"],
+        select,
         textarea,
         input[type="file"] {
             width: 100%;
@@ -118,6 +120,16 @@ $data = $query->fetch_assoc();
     <form method="POST" enctype="multipart/form-data">
         <label>Nama Toko</label>
         <input type="text" name="nama_toko" value="<?= htmlspecialchars($data['nama_toko']) ?>" required>
+
+        <label>Kecamatan</label>
+        <select name="kecamatan" required>
+            <option value="">-- Pilih Kecamatan --</option>
+            <option value="Taktakan" <?= $data['kecamatan_toko'] === 'Taktakan' ? 'selected' : '' ?>>Taktakan</option>
+            <option value="Cipocok Jaya" <?= $data['kecamatan_toko'] === 'Cipocok Jaya' ? 'selected' : '' ?>>Cipocok Jaya</option>
+            <option value="Kasemen" <?= $data['kecamatan_toko'] === 'Kasemen' ? 'selected' : '' ?>>Kasemen</option>
+            <option value="Curug" <?= $data['kecamatan_toko'] === 'Curug' ? 'selected' : '' ?>>Curug</option>
+            <option value="Serang" <?= $data['kecamatan_toko'] === 'Serang' ? 'selected' : '' ?>>Serang</option>
+        </select>
 
         <label>Deskripsi</label>
         <textarea name="deskripsi" rows="5"><?= htmlspecialchars($data['deskripsi']) ?></textarea>
