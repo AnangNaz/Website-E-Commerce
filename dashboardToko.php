@@ -137,6 +137,7 @@ $produk_result = $conn->query("SELECT * FROM produk WHERE store_id = $store_id")
         <h2>Dashboard Toko: <?php echo htmlspecialchars($nama_toko); ?></h2>
         <div class="button-group">
             <a href="formupload.php">➕ Tambah Produk</a>
+             <a href="editToko.php?id=<?php echo $store_id; ?>">✏️ Edit Toko</a>
             <a href="index.php">🏠 Home</a>
             <a href="laporanpenjualan.php">📊 Laporan Penjualan</a>
         </div>
