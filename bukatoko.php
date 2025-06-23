@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $logo = file_get_contents($_FILES['logo']['tmp_name']);
     }
 
-    $stmt = $conn->prepare("INSERT INTO stores (user_id, nama_toko, kecamatan_toko, deskripsi, logo) VALUES (?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO stores (user_id, nama_toko, kecamatan, deskripsi, logo) VALUES (?, ?, ?, ?, ?)");
 
     if (!$stmt) {
         $pesan = "❌ Gagal mempersiapkan statement: " . $conn->error;

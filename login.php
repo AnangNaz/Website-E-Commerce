@@ -4,49 +4,65 @@ include("koneksi.php");
 
 $error = '';
 $pesan = '';
+
+// Ambil pesan error jika ada di session
 if (isset($_SESSION['error'])) {
     $error = $_SESSION['error'];
     unset($_SESSION['error']);
 }
+
 if (isset($_SESSION['pesan'])) {
     $pesan = $_SESSION['pesan'];
     unset($_SESSION['pesan']);
 }
 
+// Proses login ketika form dikirim
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'] ?? '';
+    $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
 
     if (empty($email) || empty($password)) {
-        $error = "Email dan password harus diisi.";
-    } else {
-        $query = "SELECT * FROM user WHERE email = ?";
-        $stmt = $conn->prepare($query);
-        if ($stmt) {
-            $stmt->bind_param("s", $email);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if ($result && $result->num_rows === 1) {
-                $user = $result->fetch_assoc();
-                if (password_verify($password, $user['password'])) {
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['user_name'] = $user['nama'];
-                    header("Location: index.php");
-                    exit();
-                } else {
-                    $error = "Password salah.";
-                }
-            } else {
-                $error = "Email tidak ditemukan.";
-            }
-            $stmt->close();
-        } else {
-            $error = "Terjadi kesalahan pada server.";
-        }
+        $_SESSION['error'] = "Email dan password harus diisi.";
+        header("Location: login.php");
+        exit();
     }
+
+    $query = "SELECT * FROM user WHERE email = ?";
+    $stmt = $conn->prepare($query);
+
+    if ($stmt) {
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result && $result->num_rows === 1) {
+            $user = $result->fetch_assoc();
+
+            if (password_verify($password, $user['password'])) {
+                // Set session jika berhasil login
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_name'] = $user['nama'];
+
+                // Redirect ke index.php
+                header("Location: index.php");
+                exit();
+            } else {
+                $_SESSION['error'] = "Password salah.";
+            }
+        } else {
+            $_SESSION['error'] = "Email tidak ditemukan.";
+        }
+
+        $stmt->close();
+    } else {
+        $_SESSION['error'] = "Terjadi kesalahan pada server.";
+    }
+
+    header("Location: login.php");
+    exit();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">

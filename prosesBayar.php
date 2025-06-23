@@ -13,6 +13,7 @@ $nama_toko = $_SESSION['nama_toko'];
 $harga_satuan = $_SESSION['harga'];
 $jumlah = $_SESSION['jumlah_beli'];
 
+
 $harga = isset($_POST['harga']) ? (int)$_POST['harga'] : $harga_satuan;
 $jumlah_post = isset($_POST['jumlah']) ? (int)$_POST['jumlah'] : $jumlah;
 $metodeDipilih = $_POST['metode'] ?? '';
@@ -28,22 +29,20 @@ if ($metodeDipilih === 'bca') {
     $biayaAdmin = 0;
 }
 
-$status = 'sukses';// Ambil kecamatan toko
-$queryToko = mysqli_query($conn, "SELECT kecamatan_toko FROM stores WHERE id = $toko_id");
+$status = 'sukses';
+$queryToko = mysqli_query($conn, "SELECT kecamatan FROM stores WHERE id = $toko_id");
 $dataToko = mysqli_fetch_assoc($queryToko);
-$kecamatanToko = $dataToko['kecamatan_toko'] ?? '';
+$kecamatanToko = $dataToko['kecamatan'] ?? '';
 
-// Ambil kecamatan pembeli
 $queryUser = mysqli_query($conn, "SELECT kecamatan FROM user WHERE id = {$_SESSION['user_id']}");
 $dataUser = mysqli_fetch_assoc($queryUser);
 $kecamatanPembeli = $dataUser['kecamatan'] ?? '';
+echo '';
 
-// Ambil biaya ongkir
 $queryOngkir = mysqli_query($conn, "SELECT biaya FROM ongkir WHERE asal_kecamatan = '$kecamatanToko' AND tujuan_kecamatan = '$kecamatanPembeli'");
 $dataOngkir = mysqli_fetch_assoc($queryOngkir);
 $ongkir = $dataOngkir['biaya'] ?? 0;
 
-// Total akhir
 $totalFinal = $total + $biayaAdmin + $ongkir;
 
 $nama_pembeli = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Anonim';

@@ -191,6 +191,7 @@ $result = $stmt_penjualan->get_result();
             <th>Total Harga</th>
             <th>Pembeli</th>
             <th>Metode</th>
+            <th>ongkir</th>
             <th>Status</th>
             <th>Tanggal</th>
         </tr>
@@ -206,6 +207,7 @@ $result = $stmt_penjualan->get_result();
             <td>Rp" . number_format($data['total_harga'], 0, ',', '.') . "</td>
             <td>{$data['nama_pembeli']}</td>
             <td>" . strtoupper($data['metode_pembayaran']) . "</td>
+             <td>{$data['ongkir']}</td>
             <td>{$data['status']}</td>
             <td>{$data['tanggal']}</td>
         </tr>";

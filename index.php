@@ -1,13 +1,10 @@
 <?php
-
 session_start();
-if (!isset($_SESSION['user_id'])) {
-  header("Location: login.php");
-  exit();
+if (isset($_SESSION['user_name'])) {
+  echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
 }
-
-echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -33,7 +30,6 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
   <link rel="stylesheet" href="style.css">
 
   <style>
-
     .section-title {
       font-size: 24px;
       font-weight: 600;
@@ -186,7 +182,7 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
     <section id="top-sale">
       <div class="container py-5">
         <?php
-        $conn = new mysqli("localhost", "root", "", "ecomm");
+        $conn = new mysqli("localhost", "root", "Anangnaz", "ecomm");
         $toko_result = $conn->query("SELECT id, nama_toko FROM stores");
 
         while ($store = $toko_result->fetch_assoc()) {
@@ -216,16 +212,17 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
                 </div>
                 <div class="price py-1">IDR <?php echo number_format($row['harga'], 0, ',', '.'); ?></div>
                 <div class="stock py-1">Stok: <?php echo $stok; ?></div>
-                <?php if ($stok >= 1) { ?>
+                <?php if (isset($_SESSION['user_id'])) { ?>
                   <form action="pembayaran.php" method="post">
                     <input type="hidden" name="produk_id" value="<?php echo $row['id']; ?>">
                     <input type="hidden" name="nama" value="<?php echo $row['nama']; ?>">
                     <input type="hidden" name="harga" value="<?php echo $row['harga']; ?>">
-                    <button type="submit" id="cart" class="btn font-size-12 mt-2">Add to Cart</button>
+                    <button type="submit" id="cart" class="btn btn-primary font-size-12 mt-2">Beli</button>
                   </form>
                 <?php } else { ?>
-                  <button class="btn btn-secondary font-size-12 mt-2" disabled>Stok Habis</button>
+                  <a href="login.php" class="btn btn-primary font-size-12 mt-2" onclick="belumLogin()">Beli</a>
                 <?php } ?>
+
               </div>
             </div>
         <?php
@@ -390,17 +387,25 @@ echo "Selamat datang, " . htmlspecialchars($_SESSION['user_name']);
       </div>
 
       <!-- Baris 4: Kolom Pencarian -->
-     <div class="footer-section search-section">
+      <div class="footer-section search-section">
         <h4>Cari Sesuatu</h4>
         <form action="pencarian.php" method="GET">
-            <input type="text" name="q" placeholder="Cari di sini..." required>
-            <button type="submit">Cari</button>
+          <input type="text" name="q" placeholder="Cari di sini..." required>
+          <button type="submit">Cari</button>
         </form>
-    </div>
+      </div>
 
     </div>
   </footer>
 
+  <script>
+    function belumLogin() {
+      alert("Anda belum login. Anda akan diarahkan ke halaman login.");
+      setTimeout(function() {
+        window.location.href = "login.php";
+      }, 2000); // tunggu 2 detik
+    }
+  </script>
 </body>
 
 </html>

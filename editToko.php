@@ -4,32 +4,48 @@ include("koneksi.php");
 
 $toko_id = $_GET['id'] ?? null;
 
-if (!$toko_id) {
-    echo "ID toko tidak ditemukan.";
+if (!$toko_id || !is_numeric($toko_id)) {
+    echo "ID toko tidak ditemukan atau tidak valid.";
     exit();
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nama_toko = $_POST['nama_toko'];
-    $kecamatan = $_POST['kecamatan'];
-    $deskripsi = $_POST['deskripsi'];
+// Ambil data toko untuk ditampilkan di form
+$query = $conn->prepare("SELECT * FROM stores WHERE id = ?");
+$query->bind_param("i", $toko_id);
+$query->execute();
+$result = $query->get_result();
+$data = $result->fetch_assoc();
+$query->close();
 
-    if ($_FILES['logo']['size'] > 0) {
-        $logo = addslashes(file_get_contents($_FILES['logo']['tmp_name']));
-        $sql = "UPDATE stores SET nama_toko='$nama_toko', kecamatan_toko='$kecamatan', deskripsi='$deskripsi', logo='$logo' WHERE id=$toko_id";
-    } else {
-        $sql = "UPDATE stores SET nama_toko='$nama_toko', kecamatan_toko='$kecamatan', deskripsi='$deskripsi' WHERE id=$toko_id";
-    }
-
-    if ($conn->query($sql) === TRUE) {
-        echo "<script>alert('Toko berhasil diperbarui'); window.location.href='dashboardToko.php';</script>";
-    } else {
-        echo "Gagal mengupdate: " . $conn->error;
-    }
+if (!$data) {
+    echo "Data toko tidak ditemukan.";
+    exit();
 }
 
-$query = $conn->query("SELECT * FROM stores WHERE id=$toko_id");
-$data = $query->fetch_assoc();
+// Proses jika form disubmit
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $nama_toko = $_POST['nama_toko'] ?? '';
+    $kecamatan = $_POST['kecamatan'] ?? '';
+    $deskripsi = $_POST['deskripsi'] ?? '';
+
+    if ($_FILES['logo']['size'] > 0) {
+        $logo = file_get_contents($_FILES['logo']['tmp_name']);
+        $stmt = $conn->prepare("UPDATE stores SET nama_toko=?, kecamatan=?, deskripsi=?, logo=? WHERE id=?");
+        $stmt->bind_param("ssssi", $nama_toko, $kecamatan, $deskripsi, $logo, $toko_id);
+    } else {
+        $stmt = $conn->prepare("UPDATE stores SET nama_toko=?, kecamatan=?, deskripsi=? WHERE id=?");
+        $stmt->bind_param("sssi", $nama_toko, $kecamatan, $deskripsi, $toko_id);
+    }
+
+    if ($stmt->execute()) {
+        echo "<script>alert('Toko berhasil diperbarui'); window.location.href='dashboardToko.php';</script>";
+        exit();
+    } else {
+        echo "Gagal mengupdate: " . $stmt->error;
+    }
+
+    $stmt->close();
+}
 ?>
 
 <!DOCTYPE html>
@@ -124,11 +140,11 @@ $data = $query->fetch_assoc();
         <label>Kecamatan</label>
         <select name="kecamatan" required>
             <option value="">-- Pilih Kecamatan --</option>
-            <option value="Taktakan" <?= $data['kecamatan_toko'] === 'Taktakan' ? 'selected' : '' ?>>Taktakan</option>
-            <option value="Cipocok Jaya" <?= $data['kecamatan_toko'] === 'Cipocok Jaya' ? 'selected' : '' ?>>Cipocok Jaya</option>
-            <option value="Kasemen" <?= $data['kecamatan_toko'] === 'Kasemen' ? 'selected' : '' ?>>Kasemen</option>
-            <option value="Curug" <?= $data['kecamatan_toko'] === 'Curug' ? 'selected' : '' ?>>Curug</option>
-            <option value="Serang" <?= $data['kecamatan_toko'] === 'Serang' ? 'selected' : '' ?>>Serang</option>
+            <option value="Taktakan" <?= $data['kecamatan'] === 'Taktakan' ? 'selected' : '' ?>>Taktakan</option>
+            <option value="Cipocok Jaya" <?= $data['kecamatan'] === 'Cipocok Jaya' ? 'selected' : '' ?>>Cipocok Jaya</option>
+            <option value="Kasemen" <?= $data['kecamatan'] === 'Kasemen' ? 'selected' : '' ?>>Kasemen</option>
+            <option value="Curug" <?= $data['kecamatan'] === 'Curug' ? 'selected' : '' ?>>Curug</option>
+            <option value="Serang" <?= $data['kecamatan'] === 'Serang' ? 'selected' : '' ?>>Serang</option>
         </select>
 
         <label>Deskripsi</label>

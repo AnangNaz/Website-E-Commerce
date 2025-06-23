@@ -7,7 +7,7 @@ $pesan = '';
 $nama = '';
 $email = '';
 $no_telp = '';
-$kecamatan='';
+$kecamatan = '';
 
 if ($conn->connect_error) {
     die("Koneksi gagal: " . $conn->connect_error);
@@ -38,8 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error[] = 'Nomor telepon hanya boleh terdiri dari angka.';
     }
     if (empty($kecamatan)) {
-    $error[] = 'Kecamatan harus dipilih.';
-}
+        $error[] = 'Kecamatan harus dipilih.';
+    }
 
     // Cek duplikat email & no_telp
     if (empty($error)) {
@@ -64,18 +64,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
     }
 
-    // Insert data jika validasi lolos
-if (empty($error)) {
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-    $stmt = $conn->prepare("INSERT INTO user (nama, email, password, no_telp, kecamatan) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssss", $nama, $email, $hashed_password, $no_telp, $kecamatan);
+    if (empty($error)) {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $conn->prepare("INSERT INTO user (nama, email, password, no_telp, kecamatan) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssss", $nama, $email, $hashed_password, $no_telp, $kecamatan);
         if ($stmt->execute()) {
             $_SESSION['pesan'] = "Registrasi berhasil! Silakan login.";
             header("Location: login.php");
             exit();
         } else {
             $error[] = "Terjadi kesalahan saat menyimpan data: " . $stmt->error;
+            
         }
+
         $stmt->close();
     }
 
@@ -202,6 +203,19 @@ if (empty($error)) {
 
             <label for="no_telp">Nomor Telepon</label>
             <input type="text" name="no_telp" id="no_telp" required value="<?= htmlspecialchars($_SESSION['no_telp'] ?? '') ?>" />
+            <div class="form-group">
+                <label for="kecamatan">Kecamatan</label>
+                <select name="kecamatan" id="kecamatan" required>
+                    <option value="">-- Pilih Kecamatan --</option>
+                    <?php
+                    $daftar_kecamatan = ['Taktakan', 'Cipocok Jaya', 'Kasemen', 'Serang', 'Walantaka'];
+                    foreach ($daftar_kecamatan as $kcmt) {
+                        $selected = $kcmt === $kecamatan ? 'selected' : '';
+                        echo "<option value=\"$kcmt\" $selected>$kcmt</option>";
+                    }
+                    ?>
+                </select>
+            </div>
 
             <input type="submit" value="Daftar" />
         </form>
@@ -209,7 +223,6 @@ if (empty($error)) {
         <a class="back-link" href="login.php">Sudah punya akun? Login di sini</a>
     </div>
     <?php
-    // Hapus data session input setelah form tampil
     unset($_SESSION['nama'], $_SESSION['email'], $_SESSION['no_telp']);
     ?>
 </body>
